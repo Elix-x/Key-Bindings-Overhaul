@@ -30,33 +30,6 @@ public class NewGuiKeyBindingList extends GuiListExtended
 		super(p_i45031_2_, newGuiControls.width, newGuiControls.height, 63, newGuiControls.height - 32, 20);
 		this.guiControls = newGuiControls;
 		this.mc = p_i45031_2_;
-		/*KeyBinding[] akeybinding = (KeyBinding[])ArrayUtils.clone(p_i45031_2_.gameSettings.keyBindings);
-		Arrays.sort(akeybinding);
-		int i = 0;
-		String s = null;
-		KeyBinding[] akeybinding1 = akeybinding;
-		int j = akeybinding.length;
-
-		for (int k = 0; k < j; ++k)
-		{
-			KeyBinding keybinding = akeybinding1[k];
-			String s1 = keybinding.getKeyCategory();
-
-			if (!s1.equals(s))
-			{
-				s = s1;
-				this.field_148190_m[i++] = new NewGuiKeyBindingList.CategoryEntry(s1);
-			}
-
-			int l = p_i45031_2_.fontRenderer.getStringWidth(I18n.format(keybinding.getKeyDescription(), new Object[0]));
-
-			if (l > this.field_148188_n)
-			{
-				this.field_148188_n = l;
-			}
-
-			this.field_148190_m[i++] = new KeyEntry(keybinding, null);
-		}*/
 		AdvancedKeyBinding[] keys = KeyBindingHandler.keys.toArray(new AdvancedKeyBinding[]{});
 		Arrays.sort(keys);
 		this.field_148190_m = new GuiListExtended.IGuiListEntry[keys.length + KeyBinding.getKeybinds().size()];
@@ -165,7 +138,7 @@ public class NewGuiKeyBindingList extends GuiListExtended
 			this.btnReset.drawButton(NewGuiKeyBindingList.this.mc, mouseX, mouseY);
 			this.btnChangeKeyBinding.xPosition = x + 105;
 			this.btnChangeKeyBinding.yPosition = y;
-			this.btnChangeKeyBinding.displayString = /*GameSettings.getKeyDisplayString(this.field_148282_b.getKeyCode())*/ aKey.getDisplayString();
+			this.btnChangeKeyBinding.displayString = aKey.getDisplayString();
 			boolean flag2 = false;
 
 			for (AdvancedKeyBinding key : KeyBindingHandler.keys) {
@@ -200,7 +173,6 @@ public class NewGuiKeyBindingList extends GuiListExtended
 			}
 			else if (this.btnReset.mousePressed(NewGuiKeyBindingList.this.mc, p_148278_2_, p_148278_3_))
 			{
-				//				NewGuiKeyBindingList.this.mc.gameSettings.setOptionKeyBinding(this.buttonId, this.buttonId.getKeyCodeDefault());
 				aKey.def();
 				KeyBinding.resetKeyBindingArrayAndHash();
 				return true;

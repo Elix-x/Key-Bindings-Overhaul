@@ -12,6 +12,7 @@ import java.util.Set;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 
 import org.apache.logging.log4j.LogManager;
@@ -50,19 +51,19 @@ public class KeyBindingHandler {
 		readConfigValues();
 		saveConfig();
 	}
-	
+
 	public static void loadConfig(){
 		config.load();
 	}
-	
+
 	public static void readConfigValues(){
 		allowInGuiKeyPress = config.getBoolean("allowInGuiKeyPress", Configuration.CATEGORY_GENERAL, false, "If true, key presses while gui is opened will be detected and updated...");
 	}
-	
+
 	public static void saveConfig(){
 		config.save();
 	}
-	
+
 	public static AdvancedKeyBinding get(KeyBinding key){
 		for(AdvancedKeyBinding akey : keys){
 			if(akey.getSimpleKeyBinding() == key){
@@ -85,6 +86,7 @@ public class KeyBindingHandler {
 	}
 
 	public static void updateKeys(){
+		KeyBinding.hash.clearMap();
 		if(allowInGuiKeyPress || Minecraft.getMinecraft().currentScreen == null){
 			for(AdvancedKeyBinding key : keys){
 				key.update();
@@ -93,7 +95,7 @@ public class KeyBindingHandler {
 	}
 
 	public static void register(int id, KeyBinding keybinding) {
-		keys.add(new AdvancedSimpleKeyBinding(keybinding, id));
+		add(new AdvancedSimpleKeyBinding(keybinding, id));
 	}
 
 	public static void loadSettings(GameSettings gameSettings) {
@@ -110,10 +112,6 @@ public class KeyBindingHandler {
 
 			while ((s = bufferedreader.readLine()) != null)
 			{
-				/*if(!s.startsWith("key_")){
-					settings += s + "\n";
-					System.out.println("Detected next line without key_ while scanning: " + s);
-				}*/
 				try
 				{
 					String[] astring = s.split(":");
@@ -121,17 +119,11 @@ public class KeyBindingHandler {
 						setKeyValue(astring[0].replace("akey_", ""), astring[1]);
 					}
 				} catch(Exception e){
-					/*System.out.println("Catched exception while loading settings:");
-        			e.printStackTrace();*/
+
 				}
 			}
 
 			bufferedreader.close();
-
-			/*FileOutputStream out = new FileOutputStream(settingsFile);
-			out.write(settings.getBytes());
-			out.close();*/
-
 		} catch(Exception e){
 			System.out.println("Caught exception while loading settings:");
 			e.printStackTrace();
@@ -241,32 +233,14 @@ public class KeyBindingHandler {
 					break;
 				}
 			}
-			if(b && !keyBinding.pressed){
-				/*ReflectionHelper.setPrivateValue(KeyBinding.class, keyBinding, true, "field_74513_e", "pressed");
 
-				int pressTime = ReflectionHelper.getPrivateValue(KeyBinding.class, keyBinding, "field_151474_i", "pressTime");
-				ReflectionHelper.setPrivateValue(KeyBinding.class, keyBinding, pressTime + 1, "field_151474_i", "pressTime");*/
-				keyBinding.pressed = true;
-				keyBinding.pressTime++;
-			} else if(!b) {
-				/*ReflectionHelper.setPrivateValue(KeyBinding.class, keyBinding, false, "field_74513_e", "pressed");
-				ReflectionHelper.setPrivateValue(KeyBinding.class, keyBinding, 0, "field_151474_i", "pressTime");*/
-				keyBinding.pressed = false;
-				keyBinding.pressTime = 0;
-			}/* else if(b){
-				
-				
-			}*/
-			
-			/*if(keyBinding == Minecraft.getMinecraft().gameSettings.keyBindUseItem){
-				logger.info("Ticking right click key.");
-				logger.info("Current press value is: " + (keyBinding.pressed ? "Pressed" : "Unpressed"));
-//				if(b){
-//					ReflectionHelper.setPrivateValue(Minecraft.class, Minecraft.getMinecraft(), 20, "rightClickDelayTimer");
-//				}
-				logger.info("MC's right click delay timer: " + ReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "rightClickDelayTimer"));
-			}*/
-			
+			if(b && !getSimpleKeyBinding().pressed){
+				getSimpleKeyBinding().pressed = true;
+				getSimpleKeyBinding().pressTime++;
+			} else if(!b && getSimpleKeyBinding().pressed) {
+				getSimpleKeyBinding().pressed = false;
+				getSimpleKeyBinding().pressTime = 0;
+			}
 		}
 
 		public static boolean isKeyDown(int i) {
@@ -303,7 +277,7 @@ public class KeyBindingHandler {
 		}
 
 	}
-	
+
 	/**
 	 * Advanced key binding with defaultation specified as resetting to original key binding's default value.
 	 * Used to replace all vanilla key bindings...
@@ -313,22 +287,22 @@ public class KeyBindingHandler {
 	public static class AdvancedSimpleKeyBinding extends AdvancedKeyBinding {
 
 		private final int def;
-		
+
 		public AdvancedSimpleKeyBinding(KeyBinding keybinding, int defId) {
 			super(keybinding);
 			def = defId;
 		}
-		
+
 		public boolean isDefault(){
 			return !keyIds.isEmpty() && keyIds.size() == 1 && keyIds.contains(def);
 		}
-		
+
 		@Override
 		public void def() {
 			keyIds.clear();
 			keyIds.add(def);
 		}
-		
+
 	}
 
 }

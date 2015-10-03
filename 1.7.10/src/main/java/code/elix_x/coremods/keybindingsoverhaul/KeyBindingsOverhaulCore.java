@@ -12,7 +12,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.SortingIndex;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 @Name(value = "keysoverhaul")
-@TransformerExclusions(value = "code.elix_x.coremods")
+@TransformerExclusions(value = "code.elix_x.coremods.keybindingsoverhaul.core")
 @MCVersion(value = "1.7.10")
 public final class KeyBindingsOverhaulCore implements IFMLLoadingPlugin{
 

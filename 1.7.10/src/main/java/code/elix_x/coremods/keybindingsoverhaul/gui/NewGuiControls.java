@@ -97,9 +97,6 @@ public class NewGuiControls extends GuiScreen
 	{
 		if (this.buttonId != null)
 		{
-			/* this.options.setOptionKeyBinding(this.buttonId, -100 + p_73864_3_);
-            this.buttonId = null;
-            KeyBinding.resetKeyBindingArrayAndHash();*/
 			set.add(-100 + id);
 			buttonId.keyIds.clear();
 			buttonId.keyIds.addAll(set);

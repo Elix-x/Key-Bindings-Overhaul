@@ -14,7 +14,6 @@ public class ClientTickEvent {
 	@SubscribeEvent
 	public void onTick(TickEvent.ClientTickEvent event){
 		if(event.phase == Phase.START){
-//			InputHandler.updateStates();
 			KeyBindingHandler.updateKeys();
 		}
 	}

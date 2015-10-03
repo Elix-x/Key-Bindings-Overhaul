@@ -3,13 +3,16 @@ package code.elix_x.coremods.keybindingsoverhaul.gui;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import code.elix_x.coremods.keybindingsoverhaul.KeyBindingsOverhaulBase;
 import code.elix_x.coremods.keybindingsoverhaul.api.KeyBindingHandler;
-import code.elix_x.mods.powerofbreathing.BreathModBase;
-import code.elix_x.mods.powerofbreathing.proxy.ClientProxy;
+import cpw.mods.fml.client.IModGuiFactory;
+import cpw.mods.fml.client.config.DummyConfigElement.DummyCategoryElement;
+import cpw.mods.fml.client.config.GuiConfig;
+import cpw.mods.fml.client.config.IConfigElement;
+import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
@@ -17,11 +20,6 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import cpw.mods.fml.client.IModGuiFactory;
-import cpw.mods.fml.client.config.GuiConfig;
-import cpw.mods.fml.client.config.IConfigElement;
-import cpw.mods.fml.client.config.DummyConfigElement.DummyCategoryElement;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 
 public class KBOConfigsGUIFactory implements IModGuiFactory{
 

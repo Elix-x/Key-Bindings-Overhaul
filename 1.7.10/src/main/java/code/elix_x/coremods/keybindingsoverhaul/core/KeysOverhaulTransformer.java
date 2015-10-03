@@ -47,16 +47,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 			logger.info("##################################################");
 			return b;
 		}
-		if(name.equals(KeysOverhaulTranslator.getMapedClassName("client.Minecraft"))){
-			logger.info("##################################################");
-			logger.info("Patching Minecraft");
-
-			byte[] b = patchMinecraft(name, bytes);
-
-			logger.info("Patching Minecraft Completed");
-			logger.info("##################################################");
-			return b;
-		}
 		if(name.equals(KeysOverhaulTranslator.getMapedClassName("client.settings.GameSettings"))){
 			logger.info("##################################################");
 			logger.info("Patching GameSettings");
@@ -122,12 +112,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 					AbstractInsnNode skipTo = null;
 
 					for(AbstractInsnNode currentNode : method.instructions.toArray()){
-						/*if(currentNode.getOpcode() == Opcodes.GETFIELD){
-							FieldInsnNode field = (FieldInsnNode) currentNode;
-							if(field.owner.replace("/", ".").equals(KeysOverhaulTranslator.getMapedClassName("client.settings.GameSettings")) && field.name.equals(KeysOverhaulTranslator.getMapedMethodName("GameSettings", "field_74324_K", "keyBindings"))){
-								methodCall = currentNode.getNext();
-							}
-						}*/
 						if(currentNode.getOpcode() == Opcodes.INVOKEVIRTUAL){
 							MethodInsnNode m = (MethodInsnNode) currentNode;
 							if(m.owner.equals("java/io/PrintWriter") && m.name.equals("println") && m.desc.equals("(Ljava/lang/String;)V")){
@@ -150,18 +134,12 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 							}
 						}
 					}
-
-//					LabelNode gotol = new LabelNode();
-
+					
 					InsnList list = new InsnList();
 					list.add(new LabelNode());
 					list.add(new VarInsnNode(Opcodes.ALOAD, 1));
 					list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code.elix_x.coremods.keybindingsoverhaul.core.AsmHooks".replace(".", "/"), "saveSettings", "(Ljava/io/PrintWriter;)V", false));
-//					list.add(new LabelNode());
-//					list.add(new JumpInsnNode(Opcodes.GOTO, gotol));
 					method.instructions.insert(methodCall, list);
-
-//					method.instructions.insert(skipTo, gotol);
 
 					logger.info("Patching saveOptions Completed");
 					logger.info("**************************************************");
@@ -173,7 +151,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 		}
 
 		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-//		ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 		classNode.accept(writer);
 		return writer.toByteArray();
 	}
@@ -223,8 +200,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 
 						InsnList list = new InsnList();
 						list.add(new LabelNode());
-						//					list.add(new VarInsnNode(Opcodes.ILOAD, 4));
-						//					list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code.elix_x.coremods.keybindingsoverhaul.keys.AsmHooks", "onMouseEventCheck", "", false));
 						list.add(new JumpInsnNode(Opcodes.GOTO, gotol));
 						method.instructions.insert(methodCall, list);
 
@@ -288,47 +263,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 		return writer.toByteArray();
 	}
 
-
-	/*private void patchKeyboardSection(MethodNode method) {
-
-	}
-
-	private void patchMouseSection(MethodNode method) {
-		AbstractInsnNode targetNode = null;
-
-		for(AbstractInsnNode currentNode : method.instructions.toArray()){
-			if(currentNode.getOpcode() == Opcodes.INVOKEVIRTUAL){
-				MethodInsnNode m = (MethodInsnNode) currentNode;
-				if(m.owner.replace("/", ".").equals(KeysOverhaulTranslator.getMapedClassName("profiler.Profiler")) && m.name.equals(KeysOverhaulTranslator.getMapedMethodName("Profiler", "func_76318_c", "endStartSection"))){
-					if(m.getPrevious().getOpcode() == Opcodes.LDC){
-						LdcInsnNode ldc = (LdcInsnNode) m.getPrevious();
-						if(ldc.cst instanceof String){
-							if(ldc.cst.equals("mouse")){
-								targetNode = currentNode;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		LabelNode end = new LabelNode();
-
-		InsnList list = new InsnList();
-		list.add(new LabelNode());
-		list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code/elix_x/coremods/keysoverhaul/keys/AsmHooks", "mouseSection", "()V"));
-		list.add(new JumpInsnNode(Opcodes.GOTO, end));
-
-		method.instructions.insert(targetNode, list);
-
-		AbstractInsnNode endTargetNode = null;
-
-		for(AbstractInsnNode currentNode : method.instructions.toArray()){
-
-		}
-	}*/
-
 	private byte[] patchKeyBinding(String name, byte[] bytes) {
 		String onTick = KeysOverhaulTranslator.getMapedMethodName("KeyBinding", "func_74507_a", "onTick");
 		String onTickDesc = KeysOverhaulTranslator.getMapedMethodDesc("KeyBinding", "func_74507_a", "(I)V");
@@ -343,70 +277,6 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 		classReader.accept(classNode, 0);
 
 		for(MethodNode method : classNode.methods){
-
-			/*if(method.name.equals(onTick) && method.desc.equals(onTickDesc)){
-				try{
-					logger.info("**************************************************");
-					logger.info("Patching onTick");
-
-					InsnList list = new InsnList();
-					list.add(new LabelNode());
-					list.add(new VarInsnNode(Opcodes.ILOAD, 0));
-					list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code/elix_x/coremods/keysoverhaul/keys/AsmHooks", "onTick", "(I)V"));
-					list.add(new InsnNode(Opcodes.RETURN));
-					method.instructions.insertBefore(method.instructions.getFirst(), list);
-
-					logger.info("Patching onTick Completed");
-					logger.info("**************************************************");
-				}catch(Exception e){
-					logger.info("Patching onTick Failed With Exception:");
-					e.printStackTrace();
-					logger.info("**************************************************");
-				}
-			}
-
-			if(method.name.equals(setKeyBindState) && method.desc.equals(setKeyBindStateDesc)){
-				try{
-					logger.info("**************************************************");
-					logger.info("Patching setKeyBindState");
-
-					InsnList list = new InsnList();
-					list.add(new LabelNode());
-					list.add(new VarInsnNode(Opcodes.ILOAD, 0));
-					list.add(new VarInsnNode(Opcodes.ILOAD, 1));
-					list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code/elix_x/coremods/keysoverhaul/keys/AsmHooks", "setKeyBindState", "(IZ)V"));
-					list.add(new InsnNode(Opcodes.RETURN));
-					method.instructions.insertBefore(method.instructions.getFirst(), list);
-
-					logger.info("Patching setKeyBindState Completed");
-					logger.info("**************************************************");
-				}catch(Exception e){
-					logger.info("Patching setKeyBindState Failed With Exception:");
-					e.printStackTrace();
-					logger.info("**************************************************");
-				}
-			}
-
-			if(method.name.equals(resetKeyBindingArrayAndHash) && method.desc.equals(resetKeyBindingArrayAndHashDesc)){
-				try{
-					logger.info("**************************************************");
-					logger.info("Patching resetKeyBindingArrayAndHash");
-
-					InsnList list = new InsnList();
-					list.add(new LabelNode());
-					list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code/elix_x/coremods/keysoverhaul/keys/AsmHooks", "resetKeyBindingArrayAndHash", "()V"));
-					//					list.add(new InsnNode(Opcodes.RETURN));
-					method.instructions.insertBefore(method.instructions.getFirst(), list);
-
-					logger.info("Patching resetKeyBindingArrayAndHash Completed");
-					logger.info("**************************************************");
-				}catch(Exception e){
-					logger.info("Patching resetKeyBindingArrayAndHash Failed With Exception:");
-					e.printStackTrace();
-					logger.info("**************************************************");
-				}
-			}*/
-
 			if(method.name.equals(init)){
 				try{
 					logger.info("**************************************************");
@@ -446,63 +316,4 @@ public class KeysOverhaulTransformer implements IClassTransformer{
 		return writer.toByteArray();
 	}
 
-	//runTickOld 
-	//
-	//	/*patchMouseSection(method);
-	//	patchKeyboardSection(method);*/
-	//	
-	//	AbstractInsnNode targetNode = null;
-	//
-	//	for(AbstractInsnNode currentNode : method.instructions.toArray()){
-	//		if(currentNode.getOpcode() == Opcodes.INVOKEVIRTUAL){
-	//			MethodInsnNode m = (MethodInsnNode) currentNode;
-	//			if(m.owner.replace("/", ".").equals(KeysOverhaulTranslator.getMapedClassName("profiler.Profiler")) && m.name.equals(KeysOverhaulTranslator.getMapedMethodName("Profiler", "func_76318_c", "endStartSection"))){
-	//				if(m.getPrevious().getOpcode() == Opcodes.LDC){
-	//					LdcInsnNode ldc = (LdcInsnNode) m.getPrevious();
-	//					if(ldc.cst instanceof String){
-	//						if(ldc.cst.equals("mouse")){
-	//							targetNode = currentNode;
-	//							break;
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//	}
-	//	
-	//	LabelNode end = new LabelNode();
-	//	
-	//	InsnList list = new InsnList();
-	//	list.add(new LabelNode());
-	//	list.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "code/elix_x/coremods/keysoverhaul/keys/AsmHooks", "runTick", "()V"));
-	//	list.add(new JumpInsnNode(Opcodes.GOTO, end));
-	//	
-	//	method.instructions.insert(targetNode, list);
-	//	
-	//	AbstractInsnNode endTargetNode = null;
-	//	
-	//	/*
-	//	 *  FRAME FULL [net/minecraft/client/Minecraft java/util/Queue T T I I] [net/minecraft/client/Minecraft I]
-	//	 *  INVOKESPECIAL net/minecraft/client/Minecraft.func_147115_a (Z)V
-	//	 */
-	//	for(AbstractInsnNode currentNode : method.instructions.toArray()){
-	//		if(currentNode.getOpcode() == Opcodes.INVOKESPECIAL){
-	//			MethodInsnNode m = (MethodInsnNode) currentNode;
-	//			if(m.owner.replace("/", ".").equals(KeysOverhaulTranslator.getMapedClassName("client.Minecraft")) && m.name.equals(KeysOverhaulTranslator.getMapedMethodName("Minecraft", "func_147115_a", "func_147115_a"))){
-	//				/*if(m.getPrevious().getOpcode() == Opcodes.LDC){
-	//					LdcInsnNode ldc = (LdcInsnNode) m.getPrevious();
-	//					if(ldc.cst instanceof String){
-	//						if(ldc.cst.equals("mouse")){
-	//							targetNode = currentNode;
-	//							break;
-	//						}
-	//					}
-	//				}*/
-	//				endTargetNode = currentNode;
-	//				break;
-	//			}
-	//		}
-	//	}
-	//	
-	//	method.instructions.insert(endTargetNode, end);
 }
